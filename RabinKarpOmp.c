@@ -3,8 +3,9 @@
 #include <math.h>
 #include <stdbool.h>
 #include <omp.h>
-
-char word[1000], pattern[1000];
+#define MAX_LENGTH 1000
+char word[MAX_LENGTH], pattern[MAX_LENGTH];
+double time , time1 , time2;
 
 int CalculateHash(char s[], int start, int end)
 {
@@ -21,14 +22,10 @@ int CalculateHash(char s[], int start, int end)
     return val;
 }
 
-int main()
+void RabinKarp()
 {
     int i, j, start, end, curr_val, act_val;
     bool found;
-
-    printf("Enter the string: ");
-    scanf("%s", word);
-
     printf("Enter the pattern to be found: ");
     scanf("%s", pattern);
 
@@ -38,14 +35,16 @@ int main()
     if(len == 0 || sublen == 0 || sublen > len)
     {
         printf("Invalid Inputs.\n");
-        return 1;
+        return ;
     }
 
     act_val = CalculateHash(pattern, 0, sublen - 1);
 
     int iterations = len - sublen + 1;
 
+
     omp_set_num_threads(iterations);
+    time1 = omp_get_wtime();
 
     found = false;
     #pragma omp parallel for ordered private(curr_val) schedule(static)
@@ -65,12 +64,77 @@ int main()
         }
     }
 
-    #pragma omp barrier
+    time2 = omp_get_wtime();
+    time = time2 - time1;
+    printf("The time taken is: %.8f\n" , time);
     
     if(!found)
     {
         printf("The pattern does not exist in the string");
     }
+}
+
+int main()
+{
+    int choice;
+    printf("--------------------------------------------------------\n");
+    printf("\t\t RABIN KARP ALGORITHM OPENMP  \t\t\n");
+    printf("--------------------------------------------------------\n");
+    do
+    {
+        printf("\nEnter your choice: \n");
+        printf("1. Enter string manually \n");
+        printf("2. Read from file \n");
+        printf("3. Exit \n");
+        scanf("%d", &choice);
+        if (choice == 1)
+        {
+            printf("Enter the string: ");
+            fflush(stdin);
+            if (fgets(word, MAX_LENGTH, stdin) == NULL)
+            {
+                printf("Error reading the string from input.\n");
+                return 1;
+            }
+            RabinKarp();
+            printf("--------------------------------------------------------\n");
+        }
+        else if (choice == 2)
+        {
+            FILE *filePointer;
+            char fileName[MAX_LENGTH];
+
+            printf("Enter the file name: ");
+            scanf("%s", fileName);
+
+            filePointer = fopen(fileName, "r");
+
+            if (filePointer == NULL)
+            {
+                printf("Unable to open the file %s.\n", fileName);
+                return 1;
+            }
+
+            if (fgets(word, MAX_LENGTH, filePointer) == NULL)
+            {
+                printf("Error reading the string from the file.\n");
+                fclose(filePointer);
+                return 1;
+            }
+            fclose(filePointer);
+            RabinKarp();
+            printf("--------------------------------------------------------\n");
+        }
+        else if (choice == 3)
+        {
+            return 0;
+        }
+        else
+        {
+            printf("Wrong input! Please Enter again. \n");
+            printf("--------------------------------------------------------\n");
+        }
+    } while (choice != 3); 
 
     return 0;
 }

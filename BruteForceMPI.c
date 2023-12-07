@@ -17,6 +17,7 @@ void printarr(int arr[], int n)
 int main(int argc, char **argv)
 {
     int n, i, j, k, total = 0 , subpoints;
+    double time1 , time2 , time;
 
     MPI_Init(&argc, &argv);
 
@@ -52,6 +53,11 @@ int main(int argc, char **argv)
     int val;
 
     int local_total = 0;
+
+    if(rank == 0)
+    {
+        time1 = MPI_Wtime();
+    }
 
     if(n <= size)
     {
@@ -165,6 +171,11 @@ int main(int argc, char **argv)
         }
     }
 
+    if(rank == 0)
+    {
+        time2 = MPI_Wtime();
+    }
+
     // Reduce the local_total values from all processes to get the total
     MPI_Reduce(&local_total, &total, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
 
@@ -192,10 +203,14 @@ int main(int argc, char **argv)
             process++;
         }
 
-        printf("gathered hull\n");
-        printarr(gathered_hull , n * size);
-        printf("overall hull\n");
-        printarr(overall_hull , n);
+        // printf("gathered hull\n");
+        // printarr(gathered_hull , n * size);
+        // printf("overall hull\n");
+        // printarr(overall_hull , n);
+
+        time = time2 - time1;
+
+        printf("The time taken is: %.8f\n" , time);
     }
 
     MPI_Barrier(MPI_COMM_WORLD);

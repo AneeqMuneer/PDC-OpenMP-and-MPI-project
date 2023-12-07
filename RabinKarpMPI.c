@@ -4,7 +4,8 @@
 #include <math.h>
 #include<mpi.h>
 
-char word[1000], pattern[1000];
+#define MAX_LENGTH 1000
+char word[MAX_LENGTH], pattern[MAX_LENGTH];
 
 int CalculateHash(char s[], int start, int end)
 {
@@ -25,6 +26,7 @@ int main(int argc, char** argv)
 {
     int i, j, start, end, curr_val, act_val;
     bool found , idle = false;
+    double time1 , time2 , time;
 
     int rank , size;
 
@@ -36,7 +38,11 @@ int main(int argc, char** argv)
     if(rank == 0)
     {
         printf("Enter the string: ");
-        scanf("%s", word);
+        fflush(stdin);
+        if(fgets(word , MAX_LENGTH , stdin) == NULL)
+        {
+            printf("There is an error while reading from file.\n");
+        }
 
         printf("Enter the pattern to be found: ");
         scanf("%s", pattern);
@@ -67,6 +73,10 @@ int main(int argc, char** argv)
     //     printf("iterations = %d\n" , iterations);
     // }
 
+    if(rank == 0)
+    {
+        time1 = MPI_Wtime();
+    }
     found = false;
     if(size >= iterations)
     {
@@ -154,10 +164,20 @@ int main(int argc, char** argv)
             // }
         }
     }
+    if(rank == 0)
+    {
+        time2 = MPI_Wtime();
+    }
 
     if(!found && !idle)
     {
         printf("process %d did not found the pattern in the string\n", rank);
+    }
+
+    if(rank == 0)
+    {
+        time = time2 - time1;
+        printf("The time taken is: %.8f\n" , time);
     }
 
     MPI_Finalize();
