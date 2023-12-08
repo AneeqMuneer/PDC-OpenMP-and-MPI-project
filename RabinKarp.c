@@ -77,6 +77,7 @@ int main()
                 printf("Error reading the string from input.\n");
                 return 1;
             }
+            printf("String length: %d\n" , strlen(word));
             RabinKarp();
             printf("--------------------------------------------------------\n");
         }
@@ -103,6 +104,7 @@ int main()
                 return 1;
             }
             fclose(filePointer);
+            printf("String length: %d\n" , strlen(word));
             RabinKarp();
             printf("--------------------------------------------------------\n");
         }

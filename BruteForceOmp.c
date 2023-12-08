@@ -123,6 +123,7 @@ int main()
                 hull[i] = -1;
             }
             fclose(filePointer);
+            printf("Total Points: %d\n" , n);
             BruteForce(x, y, hull, n);
             printf("--------------------------------------------------------\n");
         }
